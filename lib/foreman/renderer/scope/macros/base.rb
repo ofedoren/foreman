@@ -3,6 +3,7 @@ module Foreman
     module Scope
       module Macros
         module Base
+          extend ApipieDSL::Module
           include Foreman::Renderer::Errors
           include ::Foreman::ForemanUrlRenderer
 
@@ -10,21 +11,51 @@ module Foreman
 
           delegate :medium_uri, to: :medium_provider
 
+          apipie :method, desc: "Returns true if subnet has a given parameter set, false otherwise.
+              This does not take inheritance into consideration,
+              it only searches for parameters assigned directly to the subnet. " do
+            required :subnet, Subnet, desc: 'a +Subnet+ object for which we check the parameter presence'
+            required :param_name, String, desc: 'a parameter +name+ to check the presence of'
+            # FIXME, can we say this returns boolean?
+            returns TrueClass
+            raises error: WrongSubnetError, desc: 'when user passes non-subnet object as +subnet+ parameter'
+          end
           def subnet_has_param?(subnet, param_name)
             validate_subnet(subnet)
             subnet.parameters.exists?(name: param_name)
           end
 
+          apipie :method, desc: "Returns the value of global setting" do
+            required :name, String, desc: "The name of the setting which can be found by hovering the setting with mouse cursor in the UI, or via API/CLI"
+            # FIXME the value can be in fact anything
+            optional :blank_default, Object, desc: "If the setting is not set to any value, this value will be returned instead"
+            # FIXME working example dsl
+            #example "global_setting('foreman_url') # => 'https://foreman.example.com'"
+            #example "global_setting('outofsync_interval', 30) # => 30"
+          end
           def global_setting(name, blank_default = nil)
             raise FilteredGlobalSettingAccessed.new(name: name) if Setting[:safemode_render] && !Foreman::Renderer.config.allowed_global_settings.include?(name.to_sym)
             setting = Setting.find_by_name(name.to_sym)
             (setting.settings_type != "boolean" && setting.value.blank?) ? blank_default : setting.value
           end
 
+          apipie :method, desc: "Returns true if plugin with a given name is installed in this Foreman instance" do
+            required :name, String, desc: 'The name of the plugin'
+            # FIXME
+            returns TrueClass
+            #example "plugin_present?('foreman_ansible') # => true"
+            #example "plugin_present?('foreman_virt_who_configure') # => false"
+          end
           def plugin_present?(name)
             Foreman::Plugin.find(name).present?
           end
 
+          apipie :method, desc: "Returns the value of parameter set on subnet" do
+            required :name, Subnet, desc: 'The subnet to load the parameter from'
+            returns 'the value'
+            #example "plugin_present?('foreman_ansible') # => true"
+            #example "plugin_present?('foreman_virt_who_configure') # => false"
+          end
           def subnet_param(subnet, param_name)
             validate_subnet(subnet)
             param = subnet.parameters.where(name: param_name).first
