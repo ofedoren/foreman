@@ -1,6 +1,13 @@
 require 'ipaddr'
 
 class Subnet < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'Subnet ' do
+    property :name, String, desc: 'Name of the subnet'
+    property :ipam_mode, Array, of: ['DB', 'Internal'], desc: 'IPAM mode of the subnet'
+  end
+
   audited
   IP_FIELDS = [:network, :mask, :gateway, :dns_primary, :dns_secondary, :from, :to]
   REQUIRED_IP_FIELDS = [:network, :mask]

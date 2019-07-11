@@ -1,5 +1,13 @@
 require 'find'
 
+ApipieDSL.configure do |config|
+  config.app_name = 'Foreman'
+  config.app_info = 'blabla'
+  config.dsl_classes_matchers = [
+    "#{Rails.root}/lib/foreman/renderer/**/*.rb"
+  ]
+end
+
 Apipie.configure do |config|
   config.app_name = "Foreman"
   config.app_info = "The Foreman is aimed to be a single address for all machines life cycle management."
