@@ -11,9 +11,10 @@ module Foreman
 
           delegate :medium_uri, to: :medium_provider
 
-          apipie :method, desc: "Returns true if subnet has a given parameter set, false otherwise.
-              This does not take inheritance into consideration,
-              it only searches for parameters assigned directly to the subnet. " do
+          apipie :method,
+                 short: "Returns true if subnet has a given parameter set, false otherwise.",
+                 desc: "This does not take parameters inheritance into consideration,
+                  it only searches for parameters assigned directly to the subnet. " do
             required :subnet, Subnet, desc: 'a __Subnet__ object for which we check the parameter presence'
             required :param_name, String, desc: 'a parameter __name__ to check the presence of'
             returns one_of: [true, false]
@@ -110,8 +111,7 @@ module Foreman
           apipie :method, desc: "Takes a block of code, runs it and prefixes the resulting text by given number of spaces.
               This is useful when rendering output is a whitespace sensitive format, such as YAML" do
             required :count, String, desc: 'The number of spaces'
-            # FIXME this is keyword argument
-            required :skip1, String, desc: 'Skips the first line prefixing, defaults to false', default: false
+            keyword :skip1, String, desc: 'Skips the first line prefixing, defaults to false', default: false
             returns String, desc: 'The indented text, that was the result of block of code'
             example "indent(2) { snippet('epel') } # => '  echo Installing yum repo\n  yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'"
             example "indent(2) { snippet('epel', skip1: true) } # => 'echo Installing yum repo\n  yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'"
@@ -173,18 +173,17 @@ module Foreman
                     :host => host, :port => port)
           end
 
-          # FIXME need keyword arguments
           # FIXME need ability to define some annotation for the example
           # FIXME need shared block
           # FIXME need a link to Host resource - unless returns links automatically
           apipie :method, desc: "Loads hosts objects. This macro returns a collection of Hosts matching search criteria.
               The collection is limited to what objects the current user is authorized to view. Also it's loaded in bulk
               of 1 000 records." do
-            optional :search, String, desc: 'a search term to limit the resulting collection, using standard search syntax', default: ''
+            keyword :search, String, desc: 'a search term to limit the resulting collection, using standard search syntax', default: ''
             # FIXME - need to say Array of symbols or strings
-            optional :includes, Array, desc: 'An array of associations represented by strings or symbols, to be included in the SQL query. The list can be extended
+            keyword :includes, Array, desc: 'An array of associations represented by strings or symbols, to be included in the SQL query. The list can be extended
               from plugins and can not be fully documented here. Most used associations are :puppetclasses, :host_statuses, :fact_names, :interfaces, :domain, :subnet', default: nil
-            optional :preload, Array, desc: 'Same as includes but using preload', default: nil
+            keyword :preload, Array, desc: 'Same as includes but using preload', default: nil
             # FIXME array of hosts
             returns Array, desc: 'The collection that can be iterated over using each_record'
             example "<% load_hosts.each_record do |host| %>

@@ -1,4 +1,10 @@
 class Hostgroup < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'A class representing host group object' do
+    property :name, String, desc: 'Host group name'
+  end
+
   audited
   include Authorizable
   extend FriendlyId
