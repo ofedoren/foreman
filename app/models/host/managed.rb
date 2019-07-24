@@ -1,9 +1,21 @@
 class Host::Managed < Host::Base
   extend ApipieDSL::Class
 
-  # FIXME needs to give it a custom label - Host::Managed
-  apipie :class, desc: 'Host::Managed' do
+  # :name, :diskLayout, :operatingsystem, :os, :environment, :ptable,,
+  #     :url_for_boot, :hostgroup, :compute_resource, :domain, :ip, :ip6, :mac, :shortname, :architecture,
+  #     :model, :certname, :capabilities, :provider, :subnet, :subnet6, :token, :location, :organization, :provision_method,
+  #     :image_build?, :pxe_build?, :otp, :realm, :nil?, :indent, :primary_interface,
+  #     :provision_interface, :interfaces, :bond_interfaces, :bridge_interfaces, :interfaces_with_identifier,
+  #     :managed_interfaces, :facts, :facts_hash, :root_pass, :sp_name, :sp_ip, :sp_mac, :sp_subnet, :use_image,
+  #     :multiboot, :jumpstart_path, :install_path, :miniroot, :medium, :bmc_nic, :templates_used, :owner, :owner_type,
+  #     :ssh_authorized_keys, :pxe_loader, :global_status, :get_status, :puppetca_token, :last_report
+
+  # FIXME needs to give it a custom label - Host::Managed but elsewher I don't want Macros namespace
+  apipie :class, desc: 'A class representing host object' do
     property :name, String, desc: 'Host FQDN'
+    property :puppetmaster, String, desc: 'URL of the Puppet master/server used by this host, typically URL of the host\'s puppet proxy'
+    property :puppet_ca_server, String, desc: 'URL of the Puppet CA server used by this host, typically URL of the host\'s puppet CA proxy'
+    property :hostgroup, Hostgroup, desc: 'Returns a host group object the host is assigned to, nil if no host group is assigned'
   end
 
   # audit the changes to this model
