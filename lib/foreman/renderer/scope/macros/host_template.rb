@@ -2,12 +2,15 @@ module Foreman
   module Renderer
     module Scope
       module Macros
-        apipie :class, desc: 'HostTemplate' do
-          property :host, String, desc: 'Host macros will execute be executed on this host object'
-        end
         module HostTemplate
-
           extend ApipieDSL::Module
+
+          # TODO see does not work inside a module
+
+          # apipie :class, desc: 'HostTemplate' do
+          #   property :host, String, desc: 'Host macros will execute be executed on this host object'
+          # end
+
           include Foreman::Renderer::Errors
 
           # FIXME seems to be ignored
@@ -67,7 +70,7 @@ module Foreman
                  # 'classes'=>[]}
                  # </pre>" do
             optional :path, String, desc: 'expanded array of strings definining a subtree of ENC output'
-            returns Hash, desc: 'part of the ENC output for a given host'
+            returns Object, desc: 'part of the ENC output for a given host'
             raises error: HostENCParamUndefined, desc: 'when user asks for invalid path.'
             example "host_enc # => { ... } "
             example "host_enc('classes') # => [] "
@@ -126,7 +129,7 @@ module Foreman
             returns Object, desc: 'evaluated value based on parameter inheritance, the value is of parameter type, hence could be e.g. String, Array, Hash'
             raises error: HostParamUndefined , desc: 'when user asks for undefined parameter.'
             example "host_param!('ntp_server') # => ntp.example.com"
-            see "host_param"
+            # see "host_param"
           end
           def host_param!(param_name)
             check_host_param(param_name)
@@ -171,7 +174,7 @@ module Foreman
             raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
             example "host_param_false?('enable-epel') # => false"
             example "host_param_false?('motd') # => false"
-            see "host_param_true?"
+            #see "host_param_true?"
           end
           def host_param_false?(name)
             check_host

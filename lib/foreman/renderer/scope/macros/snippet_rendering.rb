@@ -3,6 +3,8 @@ module Foreman
     module Scope
       module Macros
         module SnippetRendering
+          extend ApipieDSL::Module
+
           # FIXME need a long decription
           apipie :method, desc: "Renders a snippet if it exists in template source, e.g. database" do
             # long_description: "Same to snippet but does not fail and continues the main rendering if the given snippet was not found" do
@@ -12,7 +14,7 @@ module Foreman
             raises error: Foreman::Exception, desc: 'in case the snippet raised exception during rendering.'
             example "snippet_if_exist('motd') # => 'Hello world'"
             example "snippet_if_exist('ntp_server', { :variables => { :enable_ntp => true } }) # => '...'"
-            see 'snippet'
+            #see 'snippet'
           end
           def snippet_if_exists(name, options = {})
             snippet(name, { silent: true }, variables: options[:variables] || {})
