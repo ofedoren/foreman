@@ -8,10 +8,13 @@ module Foreman
           @report_headers = []
         end
 
+        extend ApipieDSL::Class
+
+        # FIXME returns one_of: [:csv, :yaml] does not work
         apipie :method, desc: "Render a report for all rows defined" do
           # long_description: "This macro is typically called at the end of the report template, after all rows
           # with data has been registered.  do
-          keyword :format, one_of: [:csv, :yaml], desc: 'the desired format of output'
+          keyword :format, Array, desc: 'the desired format of output'
           returns String, desc: 'this is the resulting report'
           example "report_render # => 'name,ip\nhost1.example.com,192.168.0.2\nhost2.example.com,192.168.0.3'"
           example "report_render(format: :yaml) # => '---\n- name: host1.example.com\n  ip: 192.168.0.2\n- name: host2.example.com\n  ip: 192.168.0.3'"
@@ -39,7 +42,7 @@ module Foreman
           # The only argument it accepts is a record definition. This is typically called in some +each+ loop. Calling
           # this at least once is important so we know what columns are to be rendered in this report.
           # Calling this macro adds a record to the rendering queue." do
-          Hash :row_data, desc: 'data in form of hash, keys are column names, values are values for this record'
+          required :row_data, Hash, desc: 'data in form of hash, keys are column names, values are values for this record'
           returns Array, desc: 'currently registered report data'
           example "report_row(:name => 'host1.example.com', :ip => '192.168.0.2')"
           example "<%- load_hosts.each_record do |host|\n  report_row(:name => host.name, :ip => host.ip)\nend -%>"

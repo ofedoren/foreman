@@ -4,7 +4,8 @@ ApipieDSL.configure do |config|
   config.app_name = 'Foreman'
   config.app_info = 'The Foreman is aimed to be a single address for all machines life cycle management.'
   config.dsl_base_url = '/dsl'
-  config.doc_base_url = '/dsldoc'
+  config.debug = true
+  config.doc_base_url = '/templates_dsl'
   config.markup = Apipie::Markup::Markdown.new if Rails.env.development? && defined? Maruku
   config.default_version = 'Template Writing Documentation'
   config.class_full_names = true
