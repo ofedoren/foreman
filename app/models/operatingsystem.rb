@@ -2,6 +2,12 @@ require 'ostruct'
 require 'uri'
 
 class Operatingsystem < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing operating system object' do
+    property :name, String, desc: 'Name of operating system consisting, e.g. RedHat, Fedora, Debian'
+  end
+
   audited
   include Authorizable
   include ValidateOsFamily

@@ -1,4 +1,10 @@
 class Environment < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing a puppet environment object' do
+    property :name, String, desc: 'Name of the environment, e.g. production'
+  end
+
   audited
   extend FriendlyId
   friendly_id :name, :reserved_words => []

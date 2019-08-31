@@ -1,21 +1,39 @@
 class Host::Managed < Host::Base
   extend ApipieDSL::Class
 
-  # :name, :diskLayout, :operatingsystem, :os, :environment, :ptable,,
-  #     :url_for_boot, :hostgroup, :compute_resource, :domain, :ip, :ip6, :mac, :shortname, :architecture,
-  #     :model, :certname, :capabilities, :provider, :subnet, :subnet6, :token, :location, :organization, :provision_method,
-  #     :image_build?, :pxe_build?, :otp, :realm, :nil?, :indent, :primary_interface,
-  #     :provision_interface, :interfaces, :bond_interfaces, :bridge_interfaces, :interfaces_with_identifier,
-  #     :managed_interfaces, :facts, :facts_hash, :root_pass, :sp_name, :sp_ip, :sp_mac, :sp_subnet, :use_image,
+  # FIXME methods are inored in this file, seems it worked before
+  #     :root_pass, :sp_name, :sp_ip, :sp_mac, :sp_subnet, :use_image,
   #     :multiboot, :jumpstart_path, :install_path, :miniroot, :medium, :bmc_nic, :templates_used, :owner, :owner_type,
   #     :ssh_authorized_keys, :pxe_loader, :global_status, :get_status, :puppetca_token, :last_report
 
   # FIXME needs to give it a custom label - Host::Managed but elsewher I don't want Macros namespace
   apipie :class, desc: 'A class representing host object' do
-    property :name, String, desc: 'Host FQDN'
-    property :puppetmaster, String, desc: 'URL of the Puppet master/server used by this host, typically URL of the host\'s puppet proxy'
-    property :puppet_ca_server, String, desc: 'URL of the Puppet CA server used by this host, typically URL of the host\'s puppet CA proxy'
+    property :architecture, Architecture, desc: 'Returns an arcihtecture object the host is assigned to, nil if no architecture is assigned (unmanaged host)'
+    property :certname, String, desc: 'Returns a name used in puppet certificate, this is usually either equal to FQDN or random UUID if `use_uuid_for_certificates` setting is enabled'
+    property :compute_resources, ComputeResource, desc: 'Returns a compute resource object the host exists in, nil if no compute resource is assigned (e.g. baremetal host)'
+    property :domain, Domain, desc: 'Returns a domain object the host primary interface belongs to, nil if no domain is assigned (unmanaged host)'
+    property :environment, Environment, desc: 'Returns a puppet environment object the host is assigned to, nil if no puppet environment is assigned'
     property :hostgroup, Hostgroup, desc: 'Returns a host group object the host is assigned to, nil if no host group is assigned'
+    property :interfaces, Array, desc: 'Returns an array of all host interfaces objects'
+    property :ip, String, desc: 'Returns an IPv4 address of the host primary interface, e.g. "192.168.0.1"'
+    property :ip6, String, desc: 'Returns an IPv6 address of the host primary interface, e.g. "fe80::200:11ff:fe22:1122"'
+    property :mac, String, desc: 'Returns a MAC address of the host primary interface, e.g. "52:54:00:bc:c9:ca"'
+    property :location, Location, desc: 'Returns a location object of the host, returns nil if is assigned'
+    property :model, Model, desc: 'Returns a hardware model object of the host'
+    property :name, String, desc: 'Host FQDN, e.g. my-host.example.com'
+    property :operatingsystem, Operatingsystem, desc: "alias of os property"
+    property :organization, Organization, desc: 'Returns an organization object of the host, returns nil if is assigned'
+    property :os, Operatingsystem, desc: "Return an operating system object assigned to the host, nil if no OS is assigned"
+    property :otp, String, desc: "One time password obtained from IPA, used for realm enrollment during provisioning"
+    property :provision_method, String, desc: 'Returns a provisioning method used for this host, one of "build", "image". Plugins can add additional methods.'
+    property :ptable, Ptable, desc: 'Returns a partition table object assigned to the host, returns nil if none is found'
+    property :puppet_ca_server, String, desc: 'URL of the Puppet CA server used by this host, typically URL of the host\'s puppet CA proxy'
+    property :puppetmaster, String, desc: 'URL of the Puppet master/server used by this host, typically URL of the host\'s puppet proxy'
+    property :realm, Realm, desc: 'Returns a realm object assigned to the host primary interface, returns nil if none is found'
+    property :shortname, String, desc: 'Host shortname, usually a hostname without the domain part, e.g. my-host'
+    property :subnet, Subnet, desc: 'Returns an IPv4 subnet object assigned to the host primary interface, returns nil if none is found'
+    property :subnet6, Subnet, desc: 'Returns an IPv6 subnet object assigned to the host primary interface, returns nil if none is found'
+    property :token, String, desc: 'Returns a token used for phone home calls authentication during provisioning'
   end
 
   # audit the changes to this model
@@ -374,7 +392,16 @@ class Host::Managed < Host::Base
                             end
   end
 
-  # returns the host correct disk layout, custom or common
+  apipie :method, desc: 'returns the host rendered partition table, it either uses custom partition table specified
+                         on host object itself or the one assigned as a partition table via operating system' do
+    raises error: Foreman::Exception, desc: 'if custom partition table was not specified and no partition table is assigned to host operating system family'
+    returns String, desc: 'evaluated partition table'
+    example '@host.diskLayout # =>
+"zerombr
+clearpart --all --initlabel
+autopart"', desc: 'to render the content of host partition table'
+    example '<% save_to_file "/root/ptable_debug", @host.diskLayout %>', desc: 'A snippet that could be used to store a file in shell script or kickstart %post section to save host partition table for debugging purposes'
+  end
   def diskLayout
     raise Foreman::Exception, 'Neither disk nor partition table defined for host' unless disk_layout_source
     scope = Foreman::Renderer.get_scope(host: self, source: disk_layout_source)
@@ -644,6 +671,12 @@ class Host::Managed < Host::Base
     self[:certname] || name
   end
 
+  apipie :method, desc: 'Returns the list of provisioning capabilities of this host based on its compute resource' do
+    returns Array, desc: 'Returns an array of symbols, representing capabilities of this host based on its compute resource.
+                          * `:build` means network based provisioning
+                          * `:image` means image based provisioning
+                          * `:new_volume` allows adding additional storage volumes'
+  end
   def capabilities
     compute_resource ? compute_resource.capabilities : bare_metal_capabilities
   end
@@ -652,6 +685,21 @@ class Host::Managed < Host::Base
     [:build]
   end
 
+  apipie :method, desc: 'Returns the compute resource type or BareMetal for non virtualized hosts' do
+    returns String, desc: 'String representing the provider, BareMetal for non virtualized hosts'
+    example '@host.provider # => "VMware"'
+    example '<% case @host.provider %>
+<% when "BareMetal" %>
+  echo "This is BareMetal"
+<% when "VMware" %>
+  echo "This is VMware VM"
+<% when "Google" %>
+  echo "This is VM running in Google cloud"
+<% when "EC2" %>
+  echo "This is VM running in Amazon cloud"
+<% else %>
+<% end %>'
+  end
   def provider
     if compute_resource_id
       compute_resource.provider_friendly_name
@@ -660,7 +708,7 @@ class Host::Managed < Host::Base
     end
   end
 
-  # no need to store anything in the db if the password is our default
+  #  no need to store anything in the db if the password is our default
   def root_pass
     return self[:root_pass] if self[:root_pass].present?
     return hostgroup.try(:root_pass) if hostgroup.try(:root_pass).present?
@@ -750,10 +798,16 @@ class Host::Managed < Host::Base
     explicit_pxe_loader || hostgroup.try(:pxe_loader)
   end
 
+  apipie :method, desc: 'Returns true if this host provision method is image, meaning image based provisioning, false otherwise' do
+    returns one_of: [true, false]
+  end
   def image_build?
     self.provision_method == 'image'
   end
 
+  apipie :method, desc: 'Returns true if this host provision method is build, meaning network based provisioning, false otherwise' do
+    returns one_of: [true, false]
+  end
   def pxe_build?
     self.provision_method == 'build'
   end
