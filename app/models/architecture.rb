@@ -1,4 +1,9 @@
 class Architecture < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing a partition table object' do
+    property :name, String, desc: 'Name of the Architecture'
+  end
   audited
   include Authorizable
   extend FriendlyId

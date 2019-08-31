@@ -1,4 +1,9 @@
 class Realm < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing a realm object' do
+    property :name, String, desc: 'Name of the realm'
+  end
   audited
   include Authorizable
   extend FriendlyId

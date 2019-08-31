@@ -1,5 +1,10 @@
 module Nic
   class Managed < Interface
+    extend ApipieDSL::Class
+
+    apipie :class, desc: 'TODO A class representing a network interface object' do
+      property :name, String, desc: 'FQDN represented by this interface'
+    end
     include Orchestration
     include Orchestration::DHCP
     include Orchestration::DNS
