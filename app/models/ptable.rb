@@ -3,6 +3,12 @@
 # A host object may contain a reference to one of these ptables or, alternatively, it may contain a
 # modified version of one of these in textual form
 class Ptable < Template
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing a partition table object' do
+    property :name, String, desc: 'Name of the partition table, e.g. Kickstart default'
+  end
+
   audited
   has_many :audits, :as => :auditable, :class_name => Audited.audit_class.name
 

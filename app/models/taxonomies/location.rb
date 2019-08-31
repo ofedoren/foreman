@@ -1,4 +1,9 @@
 class Location < Taxonomy
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing a location object' do
+    property :name, String, desc: 'Name of the Location'
+  end
   extend FriendlyId
   friendly_id :title
   include Foreman::ThreadSession::LocationModel
