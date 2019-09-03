@@ -27,8 +27,10 @@ class Host::Managed < Host::Base
     property :otp, String, desc: "One time password obtained from IPA, used for realm enrollment during provisioning"
     property :provision_method, String, desc: 'Returns a provisioning method used for this host, one of "build", "image". Plugins can add additional methods.'
     property :ptable, Ptable, desc: 'Returns a partition table object assigned to the host, returns nil if none is found'
-    property :puppet_ca_server, String, desc: 'URL of the Puppet CA server used by this host, typically URL of the host\'s puppet CA proxy'
-    property :puppetmaster, String, desc: 'URL of the Puppet master/server used by this host, typically URL of the host\'s puppet proxy'
+    # TODO - move to method definition
+    property :puppet_ca_server, String, desc: 'FQDN of the Puppet CA server used by this host, typically FQDN of the host\'s puppet CA proxy'
+    # TODO - move to method definition
+    property :puppetmaster, String, desc: 'FQDN of the Puppet master/server used by this host, typically FQDN of the host\'s puppet proxy'
     property :realm, Realm, desc: 'Returns a realm object assigned to the host primary interface, returns nil if none is found'
     property :shortname, String, desc: 'Host shortname, usually a hostname without the domain part, e.g. my-host'
     property :subnet, Subnet, desc: 'Returns an IPv4 subnet object assigned to the host primary interface, returns nil if none is found'
