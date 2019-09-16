@@ -3,7 +3,9 @@ require 'ipaddr'
 class Subnet < ApplicationRecord
   extend ApipieDSL::Class
 
-  apipie :class, desc: 'TODO Subnet' do
+  # TODO
+  apipie :class, 'Subnet' do
+    sections only: %w[all additional]
     property :name, String, desc: 'Name of the subnet'
     property :ipam_mode, Array, of: ['DB', 'Internal'], desc: 'IPAM mode of the subnet'
   end

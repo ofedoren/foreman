@@ -1,13 +1,15 @@
 class Host::Managed < Host::Base
   extend ApipieDSL::Class
 
-  # FIXME methods are inored in this file, seems it worked before
+  # TODO
   #     :root_pass, :sp_name, :sp_ip, :sp_mac, :sp_subnet, :use_image,
   #     :multiboot, :jumpstart_path, :install_path, :miniroot, :medium, :bmc_nic, :templates_used, :owner, :owner_type,
   #     :ssh_authorized_keys, :pxe_loader, :global_status, :get_status, :puppetca_token, :last_report
 
-  # FIXME needs to give it a custom label - Host::Managed but elsewher I don't want Macros namespace
-  apipie :class, desc: 'A class representing host object' do
+  apipie :class, 'A class representing host object' do
+    name 'Host::Managed'
+    sections only: %w[all additional]
+    refs 'Host', 'Host::Managed'
     property :architecture, Architecture, desc: 'Returns an arcihtecture object the host is assigned to, nil if no architecture is assigned (unmanaged host)'
     property :certname, String, desc: 'Returns a name used in puppet certificate, this is usually either equal to FQDN or random UUID if `use_uuid_for_certificates` setting is enabled'
     property :compute_resources, ComputeResource, desc: 'Returns a compute resource object the host exists in, nil if no compute resource is assigned (e.g. baremetal host)'
