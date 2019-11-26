@@ -5,9 +5,8 @@ module Foreman
         module HostTemplate
           extend ApipieDSL::Module
 
-          # TODO see does not work inside a module
-
           apipie :class, desc: 'HostTemplate' do
+            name 'HostTemplate'
             property :host, String, desc: 'Host macros will execute be executed on this host object'
           end
 
@@ -101,7 +100,7 @@ module Foreman
             required :param_name, String, desc: 'name of the parameter'
             optional :default, Object, desc: 'a value returned if the parameter is not defined for the host (including parameter inheritance)'
             returns Object, desc: 'evaluated value based on parameter inheritance, the value is of parameter type, hence could be e.g. String, Array, Hash'
-            raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
+            raises error: HostUnknown, desc: 'when user asks for a parameter but host is available in rendering context.'
             example "host_param('ntp_server') # => ntp.example.com"
             example "host_param('motd') # => nil"
             example "host_param('motd', 'Hello world') # => 'Hello world'"
@@ -125,9 +124,9 @@ module Foreman
               is considered for all authorization checks."
             required :param_name, String, desc: 'name of the parameter'
             returns Object, desc: 'evaluated value based on parameter inheritance, the value is of parameter type, hence could be e.g. String, Array, Hash'
-            raises error: HostParamUndefined , desc: 'when user asks for undefined parameter.'
+            raises error: HostParamUndefined, desc: 'when user asks for undefined parameter.'
             example "host_param!('ntp_server') # => ntp.example.com"
-            # see "host_param"
+            see 'host_param'
           end
           def host_param!(param_name)
             check_host_param(param_name)
@@ -138,7 +137,7 @@ module Foreman
             desc "Host can be assigned puppet classes either directly or through host groups and config
               groups. This methods returns puppet class objects assigned to host directly."
             returns Array, desc: 'evaluated value based on parameter inheritance, the value is of parameter type, hence could be e.g. String, Array, Hash'
-            raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
+            raises error: HostUnknown, desc: 'when user asks for a parameter but host is available in rendering context.'
             example "host_puppet_classes # => [...]"
           end
           def host_puppet_classes
@@ -153,7 +152,7 @@ module Foreman
               Following values are considered falsy: false, f, no, n, off, 0"
             required :param_name, String, desc: 'name of the parameter'
             returns one_of: [true, false], desc: 'true for truthy values, fales for falsy values or when parameter with a given name was not found'
-            raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
+            raises error: HostUnknown, desc: 'when user asks for a parameter but host is available in rendering context.'
             example "host_param_true?('enable-epel') # => true"
             example "host_param_true?('motd') # => false"
           end
@@ -169,10 +168,10 @@ module Foreman
               Following values are considered falsy: false, f, no, n, off, 0"
             required :param_name, String, desc: 'name of the parameter'
             returns one_of: [true, false], desc: 'true for falsy values, false for truthy values, or when parameter with a given name was not found'
-            raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
+            raises error: HostUnknown, desc: 'when user asks for a parameter but host is available in rendering context.'
             example "host_param_false?('enable-epel') # => false"
             example "host_param_false?('motd') # => false"
-            #see "host_param_true?"
+            see 'host_param_true?'
           end
           def host_param_false?(name)
             check_host
@@ -187,7 +186,7 @@ module Foreman
               Whenever the host object is saved and it's root password is missing, it copies value from host group/setting
               and hashes it, so the password remains set the same even if common value changes."
             returns String, desc: 'either a hash or plain text of password based on source'
-            raises error: HostUnknown , desc: 'when user asks for a parameter but host is available in rendering context.'
+            raises error: HostUnknown, desc: 'when user asks for a parameter but host is available in rendering context.'
             example "root_pass # => '$5$0XSSSSrdSn1l3mzn$6KeSBoHpg8pEgCK5JexVB4WqFqTI72ZYaE8jMaEcmWC'"
             example "root_pass # => 'changeme'"
           end

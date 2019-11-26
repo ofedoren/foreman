@@ -13,7 +13,7 @@ module Foreman
             raises error: Foreman::Exception, desc: 'in case the snippet raised exception during rendering.'
             example "snippet_if_exist('motd') # => 'Hello world'"
             example "snippet_if_exist('ntp_server', { :variables => { :enable_ntp => true } }) # => '...'"
-            #see 'snippet'
+            see 'snippet'
           end
           def snippet_if_exists(name, options = {})
             snippet(name, { silent: true }, variables: options[:variables] || {})

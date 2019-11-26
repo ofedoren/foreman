@@ -263,6 +263,7 @@ module Host
       returns Hash, desc: 'A hash of facts, keys are fact names, values are fact values'
       example '@host.facts # => { "hardwareisa"=>"x86_64", "kernel"=>"Linux", "virtual"=>"physical", ... }', desc: 'Getting all host facts'
       example '@host.facts["uptime"] # => "30 days"', desc: 'Getting specific fact value, +uptime+ in this caes'
+      aliases :facts
     end
     def facts_hash
       hash = {}
@@ -272,7 +273,6 @@ module Host
       hash
     end
 
-    apipie :method, name: 'facts', desc: 'alias for facts_hash macro'
     alias_method :facts, :facts_hash
 
     def ==(comparison_object)

@@ -15,12 +15,11 @@ module Foreman
           @report_headers = []
         end
 
-        # FIXME returns one_of: [:csv, :yaml] does not work
-        apipie :method, desc: "Render a report for all rows defined" do
-          # long_description: "This macro is typically called at the end of the report template, after all rows
-          # with data has been registered.  do
+        apipie :method, 'Render a report for all rows defined' do
+          desc "This macro is typically called at the end of the report template, after all rows
+            with data has been registered."
           keyword :format, Array, desc: 'the desired format of output'
-          returns String, desc: 'this is the resulting report'
+          returns one_of: [:csv, :yaml], desc: 'this is the resulting report'
           example "report_render # => 'name,ip\nhost1.example.com,192.168.0.2\nhost2.example.com,192.168.0.3'"
           example "report_render(format: :yaml) # => '---\n- name: host1.example.com\n  ip: 192.168.0.2\n- name: host2.example.com\n  ip: 192.168.0.3'"
         end
@@ -42,11 +41,11 @@ module Foreman
           @report_headers = headers.map(&:to_s)
         end
 
-        apipie :method, desc: "Register a row of data for the report" do
-          # long_description: "For every record that should be part of the report, +report_row+ macro needs to be called.
-          # The only argument it accepts is a record definition. This is typically called in some +each+ loop. Calling
-          # this at least once is important so we know what columns are to be rendered in this report.
-          # Calling this macro adds a record to the rendering queue." do
+        apipie :method, 'Register a row of data for the report' do
+          desc "For every record that should be part of the report, +report_row+ macro needs to be called.
+            The only argument it accepts is a record definition. This is typically called in some +each+ loop. Calling
+            this at least once is important so we know what columns are to be rendered in this report.
+            Calling this macro adds a record to the rendering queue."
           required :row_data, Hash, desc: 'data in form of hash, keys are column names, values are values for this record'
           returns Array, desc: 'currently registered report data'
           example "report_row(:name => 'host1.example.com', :ip => '192.168.0.2')"
