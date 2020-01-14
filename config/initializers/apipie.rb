@@ -22,6 +22,7 @@ ApipieDSL.configure do |config|
     trans
   end
   config.help_layout = 'apipie_dsl/apipie_dsls/help.html.erb'
+  config.use_cache = Rails.env.production? || File.directory?(config.cache_dir)
 end
 
 Apipie.configure do |config|
