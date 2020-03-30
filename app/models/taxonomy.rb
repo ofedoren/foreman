@@ -1,4 +1,12 @@
 class Taxonomy < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :prop_group, name: :taxonomy_props do
+    property :description, String, desc: "Description of the #{@meta[:class_scope]}"
+    property :created_at, String, desc: "The time when the #{@meta[:class_scope]} was created"
+    property :updated_at, String, desc: "The last time when the #{@meta[:class_scope]} was updated"
+  end
+
   validates_lengths_from_database
 
   include Authorizable

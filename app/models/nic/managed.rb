@@ -1,5 +1,13 @@
 module Nic
   class Managed < Interface
+    extend ApipieDSL::Class
+
+    apipie :class, 'TODO A class representing a network interface object' do
+      name 'Nic::Managed'
+      sections only: %w[all additional]
+      refs 'Nic::Managed'
+      prop_group :basic_model_props, ApplicationRecord, meta: { friendly_name: 'interface', name_desc: 'FQDN represented by this interface' }
+    end
     include Orchestration
     include Orchestration::DHCP
     include Orchestration::DNS

@@ -1,6 +1,24 @@
 require 'ipaddr'
 
 class Subnet < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, 'A class representing a subnet object' do
+    name 'Subnet'
+    sections only: %w[all additional]
+    prop_group :basic_model_props, ApplicationRecord
+    property :network, String, desc: 'Returns the Network Address, e.g. 192.168.122.0'
+    property :mask, String, desc: 'Returns the Network mask, e.g. 255.255.255.0'
+    property :gateway, String, desc: 'Returns the Gateway Address, e.g. 192.168.122.1'
+    property :dns_primary, String, desc: 'Returns the Primary DNS Server Address, e.g. 192.168.122.1'
+    property :dns_secondary, String, desc: 'Returns the Secondary DNS Server Address'
+    property :vlanid, Integer, desc: 'Returns the VLAN ID for of this subnet'
+    property :mtu, Integer, desc: 'Returns the MTU'
+    property :nic_delay, Array, desc: 'Returns the Delay network activity during installation, NICs attached to this subnet will be have linksleep configured in Kickstart to given amount of seconds'
+    property :boot_mode, String, desc: 'Returns the Default boot mode for interfaces assigned to this subnet, applied to hosts from provisioning templates, e.g static or DHCP'
+    property :description, String, desc: 'Returns the subnet Description'
+  end
+
   audited
   IP_FIELDS = [:network, :mask, :gateway, :dns_primary, :dns_secondary, :from, :to]
   REQUIRED_IP_FIELDS = [:network, :mask]
@@ -132,6 +150,9 @@ class Subnet < ApplicationRecord
     "#{network}/#{cidr}"
   end
 
+  apipie :method, desc: 'Returns the subnet label' do
+    returns String, desc: 'Returns the the subnet label which is a combination of name and the network address'
+  end
   def to_label
     "#{name} (#{network_address})"
   end
@@ -159,6 +180,9 @@ class Subnet < ApplicationRecord
     IPAddr.new("#{network}/#{mask}", family)
   end
 
+  apipie :method, desc: 'Returns the network prefix' do
+    returns Integer, desc: 'Returns the network prefix or nil in case of invalid error'
+  end
   def cidr
     return if mask.nil?
     IPAddr.new(mask).to_i.to_s(2).count("1")
@@ -173,6 +197,9 @@ class Subnet < ApplicationRecord
     nil
   end
 
+  apipie :method, desc: 'Returns true if this subnet supports the dhcp ipam mode, false otherwise' do
+    returns one_of: [true, false]
+  end
   def dhcp?
     supports_ipam_mode?(:dhcp) && dhcp && dhcp.url.present?
   end
@@ -234,6 +261,9 @@ class Subnet < ApplicationRecord
     ipam? && ipam == IPAM::MODES[:external_ipam]
   end
 
+  apipie :method, desc: 'Returns true if this subnet if the subnet boot mode is dhcp, false otherwise' do
+    returns one_of: [true, false]
+  end
   def dhcp_boot_mode?
     boot_mode == Subnet::BOOT_MODES[:dhcp]
   end
@@ -298,6 +328,9 @@ class Subnet < ApplicationRecord
     [dhcp, tftp, dns, httpboot].compact
   end
 
+  apipie :method, desc: 'Returns true is the subnet has a vlan id, false otherwise' do
+    returns one_of: [true, false]
+  end
   def has_vlanid?
     vlanid.present?
   end
@@ -312,6 +345,9 @@ class Subnet < ApplicationRecord
     super({:methods => [:to_label, :type]}.merge(options))
   end
 
+  apipie :method, desc: 'returns An array of the dns servers address' do
+    returns Array, desc: 'dns servers address'
+  end
   def dns_servers
     [dns_primary, dns_secondary].select(&:present?)
   end

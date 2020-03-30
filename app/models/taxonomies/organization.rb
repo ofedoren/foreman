@@ -1,4 +1,12 @@
 class Organization < Taxonomy
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'A class representing an Organization object' do
+    sections only: %w[all additional]
+    prop_group :basic_model_props, ApplicationRecord, meta: { example: 'Red Hat' }
+    property :title, String, desc: 'Title of the Organization. Comparing to the name, Title also includes names of all parent Organizations, e.g. Red Hat/Engineering'
+    prop_group :taxonomy_props, Taxonomy
+  end
   extend FriendlyId
   friendly_id :title
   include Foreman::ThreadSession::OrganizationModel

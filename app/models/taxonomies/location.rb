@@ -1,4 +1,13 @@
 class Location < Taxonomy
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'A class representing a location object' do
+    sections only: %w[all additional]
+    prop_group :basic_model_props, ApplicationRecord, meta: { example: 'Europe' }
+    property :title, String, desc: 'Title of the Location. Comparing to the Name, Title contains also names of all parent Locations, e.g. Europe/Prague'
+    prop_group :taxonomy_props, Taxonomy
+  end
+
   extend FriendlyId
   friendly_id :title
   include Foreman::ThreadSession::LocationModel

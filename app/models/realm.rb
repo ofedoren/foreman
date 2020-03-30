@@ -1,4 +1,12 @@
 class Realm < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'A class representing a realm object' do
+    sections only: %w[all additional]
+    prop_group :basic_model_props, ApplicationRecord, meta: { example: 'EXAMPLE.COM' }
+    property :realm_type, String, desc: 'Realm type, e.g. FreeIPA or Active Directory'
+  end
+
   audited
   include Authorizable
   extend FriendlyId

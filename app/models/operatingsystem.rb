@@ -2,6 +2,22 @@ require 'ostruct'
 require 'uri'
 
 class Operatingsystem < ApplicationRecord
+  extend ApipieDSL::Class
+
+  apipie :class, desc: 'TODO A class representing operating system object' do
+    sections only: %w[all additional]
+    prop_group :basic_model_props, ApplicationRecord, meta: { friendly_name: 'operating system consisting', example: 'RedHat, Fedora, Debian' }
+    property :media_url, Array, desc: 'URLs of associated media'
+    property :major, String, desc: 'Major version of the operating system'
+    property :minor, String, desc: 'Minor version of the operating system'
+    property :family, String, desc: 'Family of the operating system, e.g. Redhat'
+    property :release, String, desc: 'Full release version, e.g. 7.0'
+    property :release_name, String, desc: 'Release name of the operating system, e.g. stretch'
+    property :pxe_type, String, desc: 'PXE type of the operating system, e.g. kickstart'
+    property :password_hash, String, desc: 'Encrypted hash of the operating system password'
+    property :to_s, String, desc: 'Returns full name of the operating system, e.g. CentOS 7.0'
+  end
+
   audited
   include Authorizable
   include ValidateOsFamily
@@ -192,10 +208,18 @@ class Operatingsystem < ApplicationRecord
     ""
   end
 
+  apipie :method, 'TODO' do
+    required :medium_provider, MediumProviders::Provider, 'TODO'
+    returns String, 'TODO'
+  end
   def kernel(medium_provider)
     bootfile(medium_provider, :kernel)
   end
 
+  apipie :method, 'TODO' do
+    required :medium_provider, MediumProviders::Provider, 'TODO'
+    returns String, 'TODO'
+  end
   def initrd(medium_provider)
     bootfile(medium_provider, :initrd)
   end
@@ -278,6 +302,11 @@ class Operatingsystem < ApplicationRecord
     family || self.class.deduce_family(name)
   end
 
+  apipie :method, 'TODO' do
+    required :medium_provider, MediumProviders::Provider, desc: 'TODO'
+    block desc: 'TODO'
+    returns Array, desc: 'Array of boot file sources URIs'
+  end
   def boot_files_uri(medium_provider, &block)
     boot_file_sources(medium_provider, &block).values
   end
@@ -298,6 +327,10 @@ class Operatingsystem < ApplicationRecord
     options
   end
 
+  apipie :method, 'Returns medium URI for given medium provider' do
+    required :medium_provider, MediumProviders::Provider, desc: 'Medium provider'
+    returns String, desc: 'Medium URI of given medium provider'
+  end
   def mediumpath(medium_provider)
     medium_provider.medium_uri.to_s
   end
