@@ -10,3 +10,6 @@ export { default as sortableHeaderFormatter } from './sortableHeaderFormatter';
 export { deleteActionCellFormatter } from './deleteActionCellFormatter';
 export { default as selectionCellFormatter } from './selectionCellFormatter';
 export { default as selectionHeaderCellFormatter } from './selectionHeaderCellFormatter';
+export { default as snippetCellFormatter } from './snippetCellFormatter';
+export { default as lockedCellFormatter } from './lockedCellFormatter';
+export { default as templateActionCellFormatter } from './templateActionCellFormatter';
