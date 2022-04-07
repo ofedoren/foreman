@@ -13,6 +13,7 @@
       <th class="hidden-tablet hidden-xs" width="8%"><%= sort :owner, :as => _('Owner') %></th>
       <th class="hidden-tablet hidden-xs" width="15%"><%= sort :hostgroup, :as => _("Host group") %></th>
       <th class="hidden-tablet hidden-xs" width="10%"><%= sort :last_report, :as => _('Last report'), :default => 'DESC' %></th>
+      <th class="hidden-tablet hidden-xs" width="7%"><%= sort :comment, :as => _('Comment') %></th>
       <%= render_pagelets_for(:hosts_table_column_header) %>
       <th width="100px"><%= _('Actions') %></th>
     </tr>
@@ -41,6 +42,7 @@
         </td>
         <td class="hidden-tablet hidden-xs"><%= label_with_link host.hostgroup, 23, @hostgroup_authorizer %></td>
         <td class="hidden-tablet hidden-xs ellipsis"><%= last_report_column(host) %></td>
+        <td class="hidden-tablet hidden-xs ellipsis" title="<%= host.comment&.truncate(255) %>"><%= icon_text('comment', host.comment) unless host.comment.empty? %></td>
         <%= render_pagelets_for(:hosts_table_column_content, :subject => host) %>
         <td>
           <%= action_buttons(
