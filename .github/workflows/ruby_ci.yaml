@@ -12,6 +12,8 @@ jobs:
   test_ruby:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      BUNDLE_WITHOUT: journald:development:console
     services:
       postgres:
         image: postgres:12.1
@@ -24,7 +26,7 @@ jobs:
         ruby-version: [2.5]
     steps:
       - run: sudo apt-get update
-      - run: sudo apt-get install build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+      - run: sudo apt-get install build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev libvirt-dev
       - uses: actions/checkout@v2
         with:
           repository: theforeman/foreman
