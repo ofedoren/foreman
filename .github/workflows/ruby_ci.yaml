@@ -12,8 +12,6 @@ jobs:
   test_ruby:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      BUNDLE_WITHOUT: journald:development:console:libvirt
     services:
       postgres:
         image: postgres:12.1
