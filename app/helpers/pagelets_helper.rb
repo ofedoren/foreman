@@ -67,7 +67,69 @@ module PageletsHelper
     sort col[:key], as: col[:label], default: col[:default_sort] || 'ASC'
   end
 
+  def mount_column_selector
+    url = "#{api_users_path}/#{User.current[:id]}/table_preferences"
+    has_preference = !@selected_columns.nil?
+    columns = columns_view
+    react_component("ColumnSelector", data:
+      {
+        url: url,
+        controller: controller_name,
+        columns: columns,
+        initialColumns: columns,
+        hasPreference: has_preference,
+      }
+    )
+  end
+
   private
+
+  def defined_columns
+    Pagelets::Manager.pagelets_at('hosts/_list', :hosts_table_column_header).map do |pt|
+      next unless pt.opts[:key]
+      {
+        key: pt.opts[:key],
+        label: pt.opts[:label],
+        profiles: pt.profiles.map { |pr| pr.id },
+        checked: @selected_columns ? @selected_columns.include?(pt.opts[:key].to_s) : pt.profiles.any? { |profile| profile.default? },
+      }
+    end.compact
+  end
+
+  def defined_categories(columns)
+    columns.map { |col| col[:profiles] }.flatten.uniq
+  end
+
+  def all_checked?(category)
+    return true if category.all? { |column| column[:checkProps][:checked] }
+    category.any? { |column| column[:checkProps][:checked] } ? nil : false
+  end
+
+  def columns_view
+    categories = []
+    columns = defined_columns
+    defined_categories(columns).each do |category|
+      categories << {
+        name: category.capitalize,
+        key: category,
+        defaultExpanded: category == 'general',
+        checkProps: {},
+        children: [],
+      }
+      category = categories.find { |c| c[:key] == category }
+      columns.each do |column|
+        if column[:profiles].first == category[:key]
+          category[:children] << {
+            name: column[:label],
+            key: column[:key],
+            checkProps: { checked: column[:checked] },
+          }
+        end
+      end
+      category[:checkProps][:checked] = all_checked?(category[:children])
+    end
+    categories
+  end
 
   def filter_opts(opts = {})
     opts.merge(
