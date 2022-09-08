@@ -8,7 +8,7 @@ module Queries
     test 'fetching node by relay global id' do
       query = <<-GRAPHQL
       query getNode {
-        node(id: #{global_id}) {
+        node(id: $id) {
           id
           ... on Model {
             name
@@ -17,7 +17,7 @@ module Queries
       }
       GRAPHQL
 
-      result = ForemanGraphqlSchema.execute(query, context: context, variables: {})
+      result = ForemanGraphqlSchema.execute(query, context: context, variables: { id: global_id })
 
       expected_model_attributes = {
         'id' => global_id,
