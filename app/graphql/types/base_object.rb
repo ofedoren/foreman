@@ -1,6 +1,6 @@
 module Types
-  class BaseObject < GraphQL::Types::Relay::BaseObject
-    implements GraphQL::Relay::Node.interface
+  class BaseObject < GraphQL::Schema::Object
+    implements GraphQL::Types::Relay::Node
 
     connection_type_class Connections::BaseConnection
 
