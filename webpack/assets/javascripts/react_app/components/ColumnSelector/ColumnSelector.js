@@ -1,29 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { PropTypes } from 'prop-types';
 import { Button, Modal, ModalVariant, TreeView } from '@patternfly/react-core';
+import { cloneDeep } from 'lodash';
 import { translate as __ } from '../../common/I18n';
 import API from '../../API';
 import { changeQuery } from '../../common/urlHelpers';
 
 const ColumnSelector = props => {
   const {
-    data: { url, controller, columns, initialColumns, hasPreference },
+    data: { url, controller, categories, hasPreference },
   } = props;
-
+  const initialColumns = cloneDeep(categories);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedColumns, setSelectedColumns] = useState(columns);
-  const [tablePreference, setTablePreference] = useState(hasPreference);
-
-  useEffect(() => {
-    if (!tablePreference) {
-      createTablePreference();
-      setTablePreference(true);
-    }
-
-    function createTablePreference() {
-      API.post(url, { name: 'hosts', columns: getColumnKeys() });
-    }
-  }, [url, tablePreference, selectedColumns, getColumnKeys, initialColumns]);
+  const [selectedColumns, setSelectedColumns] = useState(categories);
 
   const getColumnKeys = useCallback(() => {
     const keys = selectedColumns
@@ -39,9 +28,15 @@ const ColumnSelector = props => {
     return keys;
   }, [selectedColumns]);
 
-  const updateTablePreference = useCallback(() => {
-    API.put([url, controller].join('/'), { columns: getColumnKeys() });
-  }, [url, controller, getColumnKeys]);
+  async function updateTablePreference() {
+    if (!hasPreference) {
+      await API.post(url, { name: controller, columns: getColumnKeys() });
+      changeQuery({});
+    } else {
+      await API.put(`${url}/${controller}`, { columns: getColumnKeys() });
+      changeQuery({});
+    }
+  }
 
   const filterItems = useCallback((item, checkedItem) => {
     if (item.key === checkedItem.key) {
@@ -69,11 +64,7 @@ const ColumnSelector = props => {
     return result;
   }, []);
 
-  const onClose = () => {
-    setModalOpen(!isModalOpen);
-  };
-
-  const onCancel = () => {
+  const toggleModal = () => {
     setSelectedColumns(initialColumns);
     setModalOpen(!isModalOpen);
   };
@@ -143,7 +134,7 @@ const ColumnSelector = props => {
           id="btn-filter"
           variant="secondary"
           className="pull-left"
-          onClick={() => onClose()}
+          onClick={() => toggleModal()}
         >
           {__('Manage columns')}
         </Button>
@@ -151,7 +142,8 @@ const ColumnSelector = props => {
           variant={ModalVariant.small}
           title={__('Manage columns')}
           isOpen={isModalOpen}
-          onClose={onClose}
+          onClose={toggleModal}
+          tabIndex={0}
           description={__('Select columns to display in the table')}
           position="top"
           actions={[
@@ -161,12 +153,11 @@ const ColumnSelector = props => {
               isDisabled={isDisabled()}
               onClick={() => {
                 updateTablePreference();
-                changeQuery({});
               }}
             >
               {__('Save')}
             </Button>,
-            <Button key="cancel" variant="secondary" onClick={onCancel}>
+            <Button key="cancel" variant="secondary" onClick={toggleModal}>
               {__('Cancel')}
             </Button>,
           ]}
@@ -182,8 +173,7 @@ ColumnSelector.propTypes = {
   data: PropTypes.shape({
     url: PropTypes.string,
     controller: PropTypes.string,
-    columns: PropTypes.arrayOf(PropTypes.object),
-    initialColumns: PropTypes.arrayOf(PropTypes.object),
+    categories: PropTypes.arrayOf(PropTypes.object),
     hasPreference: PropTypes.bool,
   }),
 };
@@ -192,8 +182,7 @@ ColumnSelector.defaultProps = {
   data: {
     url: '',
     controller: '',
-    columns: [],
-    initialColumns: [],
+    categories: [],
     hasPreference: false,
   },
 };

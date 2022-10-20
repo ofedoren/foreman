@@ -69,15 +69,12 @@ module PageletsHelper
 
   def mount_column_selector
     url = "#{api_users_path}/#{User.current[:id]}/table_preferences"
-    has_preference = !@selected_columns.nil?
-    columns = columns_view
     react_component("ColumnSelector", data:
       {
         url: url,
         controller: controller_name,
-        columns: columns,
-        initialColumns: columns,
-        hasPreference: has_preference,
+        categories: columns_view,
+        hasPreference: @selected_columns.present?,
       }
     )
   end
@@ -90,14 +87,14 @@ module PageletsHelper
       {
         key: pt.opts[:key],
         label: pt.opts[:label],
-        profiles: pt.profiles.map { |pr| pr.id },
+        profiles: pt.profiles,
         checked: @selected_columns ? @selected_columns.include?(pt.opts[:key].to_s) : pt.profiles.any? { |profile| profile.default? },
       }
     end.compact
   end
 
   def defined_categories(columns)
-    columns.map { |col| col[:profiles] }.flatten.uniq
+    columns.map { |col| col[:profiles] }.flatten.uniq { |pl| pl.id }
   end
 
   def all_checked?(category)
@@ -109,24 +106,24 @@ module PageletsHelper
     categories = []
     columns = defined_columns
     defined_categories(columns).each do |category|
-      categories << {
-        name: category.capitalize,
-        key: category,
-        defaultExpanded: category == 'general',
+      category_view = {
+        name: category.label,
+        key: category.id,
+        defaultExpanded: category.id == 'general',
         checkProps: {},
         children: [],
       }
-      category = categories.find { |c| c[:key] == category }
       columns.each do |column|
-        if column[:profiles].first == category[:key]
-          category[:children] << {
+        if column[:profiles].map(&:id).include?(category_view[:key])
+          category_view[:children] << {
             name: column[:label],
             key: column[:key],
             checkProps: { checked: column[:checked] },
           }
         end
       end
-      category[:checkProps][:checked] = all_checked?(category[:children])
+      category_view[:checkProps][:checked] = all_checked?(category_view[:children])
+      categories << category_view
     end
     categories
   end
