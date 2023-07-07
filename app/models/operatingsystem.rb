@@ -79,7 +79,7 @@ class Operatingsystem < ApplicationRecord
 
   graphql_type '::Types::Operatingsystem'
 
-  apipie :class, desc: "A class representing #{model_name.human} object" do
+  apipie :class, desc: "A class representing #{model_name.singular.humanize(capitalize: false)} object" do
     sections only: %w[all additional]
     prop_group :basic_model_props, ApplicationRecord, meta: { friendly_name: 'operating system consisting', example: 'RedHat, Fedora, Debian' }
     property :major, String, desc: 'Major version of the operating system'
