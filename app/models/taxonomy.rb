@@ -37,9 +37,9 @@ class Taxonomy < ApplicationRecord
       scoped_search :on => :description, :complete_enabled => :false, :only_explicit => true
       scoped_search :on => :id, :validator => ScopedSearch::Validators::INTEGER
 
-      apipie :class, desc: "A class representing #{model_name.human} object" do
+      apipie :class, desc: "A class representing #{model_name.singular.humanize(capitalize: false)} object" do
         sections only: %w[all additional]
-        name_exl, title_exl = class_scope.model_name.human == 'Location' ? ['Europe', 'Europe/Prague'] : ['Red Hat', 'Red Hat/Engineering']
+        name_exl, title_exl = class_scope.model_name.to_s == 'Location' ? ['Europe', 'Europe/Prague'] : ['Red Hat', 'Red Hat/Engineering']
         prop_group :basic_model_props, ApplicationRecord, meta: { example: name_exl }
         property :title, String, desc: "Title of the #{class_scope}. Comparing to the Name, Title contains also names of all parent #{class_scope}s, e.g. #{title_exl}"
         property :description, String, desc: "Description of the #{class_scope}"
