@@ -12,7 +12,11 @@ module Host
       end
     end
     if type.constantize.respond_to?(method, true)
-      type.constantize.send(method, *args, &block)
+      if method.to_s =~ /\Afind_in_(.*)\Z/ && args.size == 1 && args[0].is_a?(Hash)
+        type.constantize.send(method, **args[0], &block)
+      else
+        type.constantize.send(method, *args, &block)
+      end
     else
       super
     end

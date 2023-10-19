@@ -218,10 +218,10 @@ class LookupKeyTest < ActiveSupport::TestCase
         :sc_type => 'hash',
         :value => 'a:test',
       },
-      {
-        :sc_type => 'yaml',
-        :value => '{a:test}',
-      },
+      # {
+      #   :sc_type => 'yaml',
+      #   :value => '{a:test}', # TODO: update test; apparently starting Ruby 2.7.8 this won't raise an Psych::SyntaxError. Apparently YAML/parser allows that. PKM (:
+      # },
       {
         :sc_type => 'json',
         :value => RFauxFactory.gen_alpha,

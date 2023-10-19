@@ -8,7 +8,7 @@ env:
   RAILS_ENV: test
   DATABASE_URL: postgresql://postgres:password@localhost/test
   DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: true
-  BUNDLE_WITHOUT: "console:development:journald:libvirt"
+  BUNDLE_WITHOUT: "console:development:journald"
 
 jobs:
   test:
@@ -31,7 +31,7 @@ jobs:
           - "12"
     steps:
       - run: sudo apt-get update
-      - run: sudo apt-get install build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+      - run: sudo apt-get install build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev libvirt-dev
       - name: "Check out Foreman develop"
         uses: actions/checkout@v4
         with:
