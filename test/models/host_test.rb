@@ -3305,8 +3305,9 @@ class HostTest < ActiveSupport::TestCase
     dhcp_proxy_id = host_3.primary_interface.subnet.dhcp_id
     realm_proxy_id = host_4.realm.realm_proxy_id
     puppet_ca_id = host_5.puppet_ca_proxy_id
-
-    res = Host.smart_proxy_ids(Host.where(:id => [host_1, host_2, host_3, host_4, host_5].map(&:id)))
+    ids = [host_1, host_2, host_3, host_4, host_5].map(&:id)
+    # require 'pry-byebug'; binding.pry;
+    res = Host.smart_proxy_ids(Host.where(:id => ids))
 
     [tftp_proxy_id, dns_proxy_id, dhcp_proxy_id, realm_proxy_id, puppet_ca_id].each do |id|
       assert res.include?(id)
